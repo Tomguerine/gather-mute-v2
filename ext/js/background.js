@@ -15,28 +15,28 @@ chrome.browserAction.onClicked.addListener((tab) => {
 
 function handleCommand(command) {
   chrome.windows.getAll({ populate: true }, windowList => {
-    let googleMeetTabs = getGoogleMeetTabs(windowList)
+    let gatherTabs = getGatherTabs(windowList)
 
-    if (googleMeetTabs.length > 0) {
-      processCommand(command, googleMeetTabs)
+    if (gatherTabs.length > 0) {
+      processCommand(command, gatherTabs)
     }
   })
 }
 
-function getGoogleMeetTabs(windowList) {
-  let googleMeetTabs = []
+function getGatherTabs(windowList) {
+  let gatherTabs = []
   windowList.forEach(w => {
     w.tabs.forEach(tab => {
-      if (tab && tab.url && tab.url.startsWith('https://meet.google.com/')) {
-        googleMeetTabs.push(tab)
+      if (tab && tab.url && tab.url.startsWith('https://app.gather.town/')) {
+        gatherTabs.push(tab)
       }
     })
   })
-  return googleMeetTabs
+  return gatherTabs
 }
 
-function processCommand(command, googleMeetTabs) {
-  googleMeetTabs.forEach((tab) => {
+function processCommand(command, gatherTabs) {
+  gatherTabs.forEach((tab) => {
     chrome.tabs.sendMessage(tab.id, { command: command }, (response) => {
       setIcon(response.message)
     })

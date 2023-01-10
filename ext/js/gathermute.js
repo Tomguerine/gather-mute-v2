@@ -1,3 +1,6 @@
+//TODO: No Idea what to set here to get gather mute button
+// Gather mic buton has almost no identifiers, only a class that changes like this:
+// Active: class="css-15e33lp", Muted: class="css-oau38", 
 const MUTE_BUTTON = '[role="button"][aria-label][data-is-muted]'
 
 const waitUntilElementExists = (DOMSelector, MAX_TIME = 5000) => {
@@ -41,6 +44,7 @@ function waitForMuteButton() {
 
 var muted = false
 
+//TODO: This will need to be done using the class in the button.
 function isMuted() {
   let dataIsMuted = document.querySelector(MUTE_BUTTON)
       .getAttribute('data-is-muted')
@@ -58,6 +62,7 @@ function watchIsMuted(el) {
   if (isMutedObserver) {
     isMutedObserver.disconnect()
   }
+  //TODO: This will need to be done using the class in the button.
   isMutedObserver = new MutationObserver((mutations) => {
     let newValue = mutations[0].target.getAttribute('data-is-muted') == 'true'
 
@@ -112,6 +117,7 @@ chrome.runtime.onMessage.addListener(
     sendResponse({ message: muted ? 'muted' : 'unmuted' });
   })
 
+//TODO: Fix this key to be ctrl+shift+A
 const keydownEvent = new KeyboardEvent('keydown', {
   "key": "d",
   "code": "KeyD",
