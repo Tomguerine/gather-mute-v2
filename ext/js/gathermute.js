@@ -215,7 +215,7 @@ function processPTT()
 	
 		if (muted) 
 		{
-			muted = false;
+			updateMuted(false);
 			sendBtnClickCommand();
 		}
 	}
@@ -238,9 +238,9 @@ function onPttExpired()
 	isPtt = false;
 	pttStartTime = 0;
 	
-	if (!muted) 
+	if (!muted)
 	{
-		muted = true;
+		updateMuted(true);
 		sendBtnClickCommand();
 	}
 }
