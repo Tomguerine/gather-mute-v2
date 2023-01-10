@@ -183,8 +183,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) =>
 				sendBtnClickCommand();
 			}
 		break;
-		case 'toggle_mute':
-			if (!muted) 
+		case 'unmute':
+			if (muted) 
 			{
 				muted = false;
 				sendBtnClickCommand();

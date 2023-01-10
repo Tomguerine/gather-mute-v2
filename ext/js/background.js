@@ -14,7 +14,7 @@ chrome.commands.onCommand.addListener((command) =>
 	handleCommand(command);
 });
 
-/// Listener to messages sent from gathermute .js
+/// Listener to messages sent from gathermute.js
 chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => 
 {
 	if (request.hasOwnProperty('message'))
