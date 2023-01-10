@@ -1,3 +1,10 @@
+WIP
+
+This is my attempt on adapting meet-mute to work with gather.
+If I get it to work decently, maby I'll add a propoer description here and maybe try to publish it on chrome extension store as well.
+
+---------------
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/mattsimonis/meet-mute/master/logo.png" alt="Meet Mute" style="max-width:100%;" width="64" height="64">
 </p>
