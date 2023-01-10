@@ -1,19 +1,36 @@
+/// Uncomment this line to enable debugging in chrome
+//debugger;
+
+/// Simple print function using console.Log
+function print(message)
+{
+	/// Uncomment this to enable printing.
+	//console.log(message);
+}
+
+/// Listener to Chrome commands. Shortcuts come through here
 chrome.commands.onCommand.addListener((command) => 
 {
 	handleCommand(command);
 });
 
+/// Listener to messages sent from gathermute .js
 chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => 
 {
 	if (request.hasOwnProperty('message'))
-	  setIcon(request.message);
+		setIcon(request.message);
+	
+	if (request.hasOwnProperty('log'))
+		print("Print from content script:\n" + request.log)
 });
 
+/// Extension button clicks handler
 chrome.browserAction.onClicked.addListener((tab) => 
 {
 	handleCommand('toggle_mute');
 });
 
+/// Process commands if we have a gathertab opened
 function handleCommand(command) 
 {
 	chrome.windows.getAll({ populate: true }, windowList => 
@@ -21,7 +38,7 @@ function handleCommand(command)
 		let gatherTabs = getGatherTabs(windowList);
 
 		if (gatherTabs.length > 0)
-		  processCommand(command, gatherTabs);
+			processCommand(command, gatherTabs);
 	});
 }
 
@@ -45,11 +62,13 @@ function processCommand(command, gatherTabs)
 	{
 		chrome.tabs.sendMessage(tab.id, { command: command }, (response) => 
 		{
+			print("[background][processCommand] command" + command);
 			setIcon(response.message);
 		});
 	});
 }
 
+/// Change Icon based on state
 function setIcon(status) 
 {
 	let iconType = '';
@@ -72,3 +91,5 @@ function setIcon(status)
 		title: title
 	});
 }
+
+print("Gather Mute background.js sucessfully loaded.");
