@@ -49,5 +49,13 @@
 			},
 			"global": true
 		}
+		,
+		"ptt": {
+			"description": "Push to Talk",
+			"suggested_key": {
+				"default": "Ctrl+Shift+L"
+			},
+			"global": true
+		}
 	}
 }

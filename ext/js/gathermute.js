@@ -173,10 +173,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) =>
 	switch(request.command)
 	{
 		case 'toggle_mute':
+			isPtt = false;
 			muted = !muted;
 			sendBtnClickCommand();
 		break;
 		case 'mute':
+			isPtt = false;
 			if (!muted) 
 			{
 				muted = true;
@@ -184,16 +186,64 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) =>
 			}
 		break;
 		case 'unmute':
+			isPtt = false;
 			if (muted) 
 			{
 				muted = false;
 				sendBtnClickCommand();
 			}
 		break;
+		case 'ptt':
+			processPTT();
+		break;
 	}
 	
     sendResponse({ message: muted ? 'muted' : 'unmuted' });
 });
+
+/// Push to talk methods
+var isPtt = false;
+var pttTimeoutHandle = null;
+var pttDelayTimeInMs = 1000;
+var pttResetTimerMs  = 500;
+var pttStartTime = 0;
+function processPTT()
+{
+	if (!isPtt)
+	{
+		isPtt = true;
+	
+		if (muted) 
+		{
+			muted = false;
+			sendBtnClickCommand();
+		}
+	}
+	
+	/// Check time since last timer, for performance?
+	if(Date.now() - pttStartTime < pttResetTimerMs)
+		return;
+	
+	/// Always reset timer here
+	pttStartTime = Date.now();
+	clearTimeout(pttTimeoutHandle);
+	pttTimeoutHandle = setTimeout(onPttExpired, pttDelayTimeInMs);
+}
+
+function onPttExpired()
+{
+	if(!isPtt)
+		return;
+		
+	isPtt = false;
+	pttStartTime = 0;
+	
+	if (!muted) 
+	{
+		muted = true;
+		sendBtnClickCommand();
+	}
+}
 
 ///////// Events to control gather button
 /// KeyBoard Event - Ctrl+Shift+A 
