@@ -26,11 +26,9 @@ Feel free to contact me for support or feature requests (no guarantees that I'll
 
 The Extension has 4 commands: Mute, Unmute, Toggle Mute and Push to talk
 
-After installing, don't forget to configure your shortcuts in:
+After installing, **don't forget to configure your shortcuts in: chrome://extensions/shortcuts**
 
-chrome://extensions/shortcuts
-
-I recommend using global shortcuts, so you can control gather without needing to focus on Chrome Window.
+I recommend using **global shortcuts**, so you can control gather without needing to focus on Chrome Window.
 
 ## Disclaimer
 
