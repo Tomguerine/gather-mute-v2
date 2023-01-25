@@ -22,11 +22,20 @@ function getMuteButton()
 		return mBtn;
 	
 	var queryList = document.querySelectorAll(MUTE_BUTTON);
-	if(queryList.length > 0)
+	/// 2 because we have mute and camera. If we have only 1, we dont know which of them it is.
+	if(queryList.length == 2) 
 		mBtn = queryList[0];
+	
 	if(!mBtn)
-		print("[getMuteButton] Could not get mute button.\n" +
-		"Maybe the layout of the page or button class has changed. Check this out.");
+	{
+		/// In some gather functions, like entering / exiting screen sharing the mute button is destroyed and rebuilt
+		//print("[getMuteButton] Could not get mute button.\n" +
+		//"Probably the layout of the page or button class has changed.\n" +
+		//"We will now waitForMuteButton() again.");
+		
+		updateMuted(null);
+		waitForMuteButton();
+	}
 	
 	return mBtn;
 }
@@ -113,17 +122,18 @@ const waitUntilElementExists = (MAX_TIME = 10000) =>
 /// This is used by watchBodyClass to search for mute button when
 /// Gather space id fully loaded.
 var waitingForMuteButton = false;
-function waitForMuteButton() 
+function waitForMuteButton()
 {
 	if (waitingForMuteButton) 
 		return;
 
 	waitingForMuteButton = true;
-	waitUntilElementExists().then((el) => 
+	waitUntilElementExists().then((element) => 
 	{
 		waitingForMuteButton = false;
 		updateMuted(isMuted());
-		watchIsMuted(el);
+		watchIsMuted(element);
+		watchMuteButtonDestroyed(element);
     })
     .catch((error) => 
 	{
@@ -133,8 +143,8 @@ function waitForMuteButton()
 
 /// This Method sets an observer in the actual mute button,
 /// So we can reflect changes in our internal state (and mute button icon) in realtime. 
-var isMutedObserver;
-function watchIsMuted(el) 
+var isMutedObserver = null;
+function watchIsMuted(element) 
 {
 	if (isMutedObserver) 
 		isMutedObserver.disconnect();
@@ -142,15 +152,9 @@ function watchIsMuted(el)
 	isMutedObserver = new MutationObserver((mutations) => 
 	{
 		updateMuted(isMuted());
-		
-		//let newValue = mutations[0].target.getAttribute('data-is-muted') == 'true';
-		/*let newValue = mutations[0].target.getAttribute('class') != 'css-15e33lp';*/
-
-		//if (newValue != muted) 
-		//	updateMuted(newValue);
 	});
 	
-	isMutedObserver.observe(el, 
+	isMutedObserver.observe(element, 
 	{
 		attributes: true,
 		attributeFilter: ['class'],
@@ -158,8 +162,51 @@ function watchIsMuted(el)
 	});
 }
 
+/// This Method sets an observer in mute button parent
+/// This is the best way we have to detect if mutebutton is destroyed
+/// Apparently, this doesn't work in gather. 
+///		If we delete the element from the DOM by hand, it triggers and flow works normally.
+///		But when gather changes to screen share, we NEVER get notified. =/
+///		TODO: Test the isConnected solution.
+var muteButtonDestroyedObserver = null;
+function watchMuteButtonDestroyed(element)
+{
+	if(element == null || element.parentElement == null)
+		return;
+	
+	print("[watchElementDestroyed] Registering element == " + element +
+			" with element.parentElement == " + element.parentElement);
+	
+	if (muteButtonDestroyedObserver)
+		muteButtonDestroyedObserver.disconnect();
+
+	muteButtonDestroyedObserver = new MutationObserver((mutations) => 
+	{
+		print("[watchElementDestroyed] muteButtonDestroyedObserver Callback called. Will try to recover the button with  waitForMuteButton()");
+		
+		/// TODO: Do we need to check if our specific button was destroyed or we can just assume this?
+		//if(mutations.length == 0 || mutations[0].removedNodes.length == 0)
+		//	return;
+		
+		
+		/// For now, we assume our button was destroyed and start searching for it again.
+		muteButtonDestroyedObserver.disconnect();
+		isMutedObserver.disconnect();
+		
+		updateMuted(null);
+		
+		mBtn = null;
+		waitForMuteButton();
+	});
+	
+	muteButtonDestroyedObserver.observe(element.parentElement, 
+	{
+		subtree: false,
+		childList: true
+	});
+}
+
 /// Attempt to return to "disconected" state.
-/// TODO: This is not working properly yey =/
 /// TODO: This is not working properly yet =/
 window.onbeforeunload = (event) => 
 {
