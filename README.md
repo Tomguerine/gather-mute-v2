@@ -12,9 +12,9 @@ Maybe in the future I'll publish this in Google Chrome webstore.
 For now, follow these steps:
 
 1. Clone or download this repository (https://github.com/Aeradon/gather-mute/archive/refs/heads/main.zip)
-2. Go to **chrome://extensions/**, activate **developer mode**, choose **"Load Unpacked"** and load the **"ext" folder**
+2. Go to **[chrome://extensions/](chrome://extensions/)**, activate **developer mode**, choose **"Load Unpacked"** and load the **"ext" folder**
 3. If you have gather open, **reload the tab** or close the tab and reopen it.
-4. Configure your shortcuts in **chrome://extensions/shortcuts**
+4. Configure your shortcuts in **[chrome://extensions/shortcuts](chrome://extensions/shortcuts)**
 5. If it wont work after this, right click the extension and make sure that it has access to gather website.
 
 Feel free to contact me for support or feature requests (no guarantees that I'll be able to help you, though =| )
@@ -26,7 +26,7 @@ Feel free to contact me for support or feature requests (no guarantees that I'll
 
 The Extension has 4 commands: Mute, Unmute, Toggle Mute and Push to talk
 
-After installing, **don't forget to configure your shortcuts in: chrome://extensions/shortcuts**
+After installing, **don't forget to configure your shortcuts in: [chrome://extensions/shortcuts](chrome://extensions/shortcuts)**
 
 I recommend using **global shortcuts**, so you can control gather without needing to focus on Chrome Window.
 
