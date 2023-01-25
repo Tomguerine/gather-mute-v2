@@ -18,11 +18,14 @@ const MUTE_BUTTON = 'button.css-15e33lp, button.css-oau38, button.css-1o2pj3l, b
 var mBtn = null;
 function getMuteButton()
 {
-	if(mBtn != null)
+	/// isConnected is automatically updated if mBtn is no more connected to any DOM element
+	if(mBtn != null && mBtn.isConnected)
 		return mBtn;
 	
+	mBtn = null;
+	
 	var queryList = document.querySelectorAll(MUTE_BUTTON);
-	/// 2 because we have mute and camera. If we have only 1, we dont know which of them it is.
+	/// 2 because mute and camera use the same classes. If we have only 1, we dont know which of them it is.
 	if(queryList.length == 2) 
 		mBtn = queryList[0];
 	
@@ -133,7 +136,6 @@ function waitForMuteButton()
 		waitingForMuteButton = false;
 		updateMuted(isMuted());
 		watchIsMuted(element);
-		watchMuteButtonDestroyed(element);
     })
     .catch((error) => 
 	{
@@ -159,50 +161,6 @@ function watchIsMuted(element)
 		attributes: true,
 		attributeFilter: ['class'],
 		attributeOldValue: true
-	});
-}
-
-/// This Method sets an observer in mute button parent
-/// This is the best way we have to detect if mutebutton is destroyed
-/// Apparently, this doesn't work in gather. 
-///		If we delete the element from the DOM by hand, it triggers and flow works normally.
-///		But when gather changes to screen share, we NEVER get notified. =/
-///		TODO: Test the isConnected solution.
-var muteButtonDestroyedObserver = null;
-function watchMuteButtonDestroyed(element)
-{
-	if(element == null || element.parentElement == null)
-		return;
-	
-	print("[watchElementDestroyed] Registering element == " + element +
-			" with element.parentElement == " + element.parentElement);
-	
-	if (muteButtonDestroyedObserver)
-		muteButtonDestroyedObserver.disconnect();
-
-	muteButtonDestroyedObserver = new MutationObserver((mutations) => 
-	{
-		print("[watchElementDestroyed] muteButtonDestroyedObserver Callback called. Will try to recover the button with  waitForMuteButton()");
-		
-		/// TODO: Do we need to check if our specific button was destroyed or we can just assume this?
-		//if(mutations.length == 0 || mutations[0].removedNodes.length == 0)
-		//	return;
-		
-		
-		/// For now, we assume our button was destroyed and start searching for it again.
-		muteButtonDestroyedObserver.disconnect();
-		isMutedObserver.disconnect();
-		
-		updateMuted(null);
-		
-		mBtn = null;
-		waitForMuteButton();
-	});
-	
-	muteButtonDestroyedObserver.observe(element.parentElement, 
-	{
-		subtree: false,
-		childList: true
 	});
 }
 
