@@ -4,16 +4,17 @@
 /// A "Simple" print function, using the Message system.
 function print(message)
 {
-	chrome.runtime.sendMessage({log: message});
+	//chrome.runtime.sendMessage({log: message});
 }
 
 /// Gather mic buton has almost no identifiers, only a class that changes like this:
-/// Active: class="css-15e33lp", 
-/// Active-hover: class="css-434t8s",
-/// Muted: class="css-oau38", 
-/// Muted-hover: class="css-1o2pj3l"
+/// 	Active: class="css-15e33lp", 
+/// 	Active-hover: class="css-434t8s",
+/// 	Muted: class="css-oau38", 
+/// 	Muted-hover: class="css-1o2pj3l"
 /// This method searches for the mute button by class
 const MUTE_BUTTON = 'button.css-15e33lp, button.css-oau38, button.css-1o2pj3l, button.css-434t8s'
+
 var mBtn = null;
 function getMuteButton()
 {
@@ -37,7 +38,7 @@ function isMuted()
 {
 	var muteButton = getMuteButton();
 	if(!muteButton)
-		return true;
+		return null;
 	
 	/// Considering anyting but Active and Active-hover as muted.
 	if(muteButton.className == 'css-15e33lp' || muteButton.className == 'css-434t8s')
@@ -54,7 +55,13 @@ function updateMuted(newValue)
 		return;
 	
 	muted = newValue;
-	chrome.runtime.sendMessage({ message: muted ? 'muted' : 'unmuted' });
+	
+	if(muted === null)
+		chrome.runtime.sendMessage({ message: 'disconnected'});
+	else if(muted === true)
+		chrome.runtime.sendMessage({ message: 'muted' });
+	else //if(muted === false)
+		chrome.runtime.sendMessage({ message: 'unmuted' });
 }
 
 /// This Method awaits for the initial loading, until the actual Gather
@@ -75,7 +82,7 @@ function watchBodyClass()
 }
 watchBodyClass();
 
-const waitUntilElementExists = (MAX_TIME = 5000) => 
+const waitUntilElementExists = (MAX_TIME = 10000) => 
 {
 	let timeout = 0;
 
@@ -83,15 +90,16 @@ const waitUntilElementExists = (MAX_TIME = 5000) =>
 	{
 		var muteButton = getMuteButton();
 		
-		timeout += 100;
+		timeout += 200;
 		
-		print("[waitUntilElementExists] muteButton == " + muteButton);
-
 		if (timeout >= MAX_TIME)
+		{
+			print("[waitUntilElementExists] ERROR: Element not found. This is not expected.");
 			reject('Element not found');
+		}
 
 		if (!muteButton || muteButton.length === 0) 
-			setTimeout(waitForContainerElement.bind(this, resolve, reject), 100);
+			setTimeout(waitForContainerElement.bind(this, resolve, reject), 200);
 		else 
 			resolve(muteButton);
 	}
@@ -152,12 +160,13 @@ function watchIsMuted(el)
 
 /// Attempt to return to "disconected" state.
 /// TODO: This is not working properly yey =/
+/// TODO: This is not working properly yet =/
 window.onbeforeunload = (event) => 
 {
 	chrome.runtime.sendMessage({ message: 'disconnected' });
 }
 
-/// Acctually change Mute state in gather
+/// Acctually change mute state in gather
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => 
 {
     muted = isMuted();
@@ -168,7 +177,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) =>
 		return;
 	}
 	
-	print("[chrome.runtime.onMessage.addListener] request.command === " + request.command);
+	//print("[chrome.runtime.onMessage.addListener] request.command === " + request.command);
 	
 	switch(request.command)
 	{
@@ -198,7 +207,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) =>
 		break;
 	}
 	
-    sendResponse({ message: muted ? 'muted' : 'unmuted' });
+	if(muted === null)
+		sendResponse({ message: 'disconnected' });
+	else if(muted === true)
+		sendResponse({ message: 'muted' });
+	else //if(muted === false)
+		sendResponse({ message: 'unmuted' });
 });
 
 /// Push to talk methods
