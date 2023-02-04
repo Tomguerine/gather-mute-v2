@@ -68,9 +68,16 @@ function processCommand(command, gatherTabs)
 	});
 }
 
-/// Change Icon based on state
+/// Change Icon based on status
+var buttonState = '';
 function setIcon(status) 
 {
+	///Optimization bail out
+	if(buttonState == status)
+		return;
+	
+	buttonState = status;
+	
 	let iconType = '';
 	if (status === 'muted' || status === 'unmuted') 
 		iconType = '_' + status;
