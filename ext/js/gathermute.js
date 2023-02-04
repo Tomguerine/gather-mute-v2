@@ -4,6 +4,7 @@
 /// A "Simple" print function, using the Message system.
 function print(message)
 {
+	/// Uncomment this to enable printing.
 	//chrome.runtime.sendMessage({log: message});
 }
 
@@ -168,7 +169,14 @@ function watchIsMuted(element)
 /// TODO: This is not working properly yet =/
 window.onbeforeunload = (event) => 
 {
-	chrome.runtime.sendMessage({ message: 'disconnected' });
+	try 
+	{
+		chrome.runtime.sendMessage({ message: 'disconnected' });
+	} 
+	catch (error) 
+	{
+		print("[window.onbeforeunload] ERROR: " + error);
+	}
 }
 
 /// Acctually change mute state in gather
