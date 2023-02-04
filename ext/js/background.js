@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) =>
 });
 
 /// Extension button clicks handler
-chrome.browserAction.onClicked.addListener((tab) => 
+chrome.action.onClicked.addListener((tab) => 
 {
 	handleCommand('toggle_mute');
 });
@@ -76,17 +76,18 @@ function setIcon(status)
 		iconType = '_' + status;
 
 	let title = status.charAt(0).toUpperCase() + status.substr(1);
-	chrome.browserAction.setIcon(
+	chrome.action.setIcon(
 	{
 		path: 
 		{
-			"32": `icons/icon32${ iconType }.png`,
-			"48": `icons/icon48${ iconType }.png`,
-			"128": `icons/icon128${ iconType }.png`
+			/// This path is relative to the script path
+			"32": "../icons/icon32" + iconType + ".png",
+			"48": "../icons/icon48" + iconType + ".png",
+			"128":"../icons/icon128"+ iconType + ".png"
 		}
 	});
 	
-	chrome.browserAction.setTitle(
+	chrome.action.setTitle(
 	{
 		title: title
 	});
