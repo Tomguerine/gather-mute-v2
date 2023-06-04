@@ -28,4 +28,6 @@ COPYRIGHT (C) 2022 LUIGGI REFFATTI. LICENSED UNDER THE MIT LICENSE.
 
 This is a derivative work of Meet Mute, by MATT SIMONIS, under the same License.
 
+This project is dedicated to Michele Jader Pandini, the best girlfriend this world has ever seen.
+
 [webstore-url]: https://chrome.google.com/webstore/detail/gather-mute/hfbkdcjhgnimpaeaphakpebghplfjlii
